@@ -1,0 +1,14 @@
+FROM node:12-alpine As development
+
+# Add git because this project depends on api-lib which is a public github repo dependency
+RUN apk --no-cache add git
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+
