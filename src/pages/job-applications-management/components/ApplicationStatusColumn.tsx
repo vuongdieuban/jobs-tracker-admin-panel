@@ -17,7 +17,7 @@ export function ApplicationStatusColumn(props: ApplicationStatusColumnProps) {
     <Draggable draggableId={status.id} index={index} key={status.id}>
       {(draggableProvided, draggableSnapshot) => (
         <div
-          className='col'
+          className='col-md-2'
           ref={draggableProvided.innerRef}
           {...draggableProvided.draggableProps}
           style={{
