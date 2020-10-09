@@ -11,6 +11,7 @@ import { Application } from './models/application.model';
 import { JobApplicationHelper, reorderCards, reorderColumns } from './utils';
 
 const env = process.env.NODE_ENV;
+console.log("ENV", env)
 ApiConfig.setOperationMode(env === 'development' ? OperationMode.DEV : OperationMode.PROD);
 
 const applicationHelper = new JobApplicationHelper();
