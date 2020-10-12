@@ -1,21 +1,23 @@
-import React, { Dispatch, SetStateAction, useEffect } from 'react';
-import { GoogleLogin } from 'react-google-login';
-import { Subscription } from 'rxjs';
+import React, { useContext } from 'react';
+import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
+import { AuthContext } from '../../shared/context/auth.context';
 
-interface Props {
-  setApiAccessToken: Dispatch<SetStateAction<string | null>>;
-}
+interface Props {}
 
 export const Login: React.FC<Props> = (props) => {
-  const subscriptions: Subscription[] = [];
+  const { login } = useContext(AuthContext);
 
-  useEffect(() => {
-    return () => subscriptions.forEach((s) => s.unsubscribe());
-  }, []);
+  const handleGoogleLoginSuccess = async (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
+    //offline login, we not doing this
+    if (response.code) return;
+    if (!login) return;
+    const { accessToken } = response as GoogleLoginResponse;
+    await login(accessToken);
+  };
 
-  const handleLoginSuccess = () => {};
-
-  const handleLoginFailure = () => {};
+  const handleGoogleLoginFailure = (error: any) => {
+    console.log('Google Login Fail', error);
+  };
 
   return (
     <React.Fragment>
@@ -23,8 +25,8 @@ export const Login: React.FC<Props> = (props) => {
       <GoogleLogin
         clientId='174667790191-1nbqlhhc9q996tp888v3p33q6qemgkib.apps.googleusercontent.com'
         buttonText='Login'
-        onSuccess={handleLoginSuccess}
-        onFailure={handleLoginFailure}
+        onSuccess={handleGoogleLoginSuccess}
+        onFailure={handleGoogleLoginFailure}
         cookiePolicy={'single_host_origin'}
       />
     </React.Fragment>
