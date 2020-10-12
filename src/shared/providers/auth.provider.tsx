@@ -7,20 +7,29 @@ import { User } from '../models/user.model';
 const authService = new AuthenticationService();
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const [user, setUser] = useState<User>();
-  const [apiAccessToken, setApiAccessToken] = useState<string>();
+  const [user, setUser] = useState<User | null>(null);
+  const [apiAccessToken, setApiAccessToken] = useState<string | null>(null);
 
   const login = async (oauthAccessToken: string) => {
-    const result = await authService.login({ accessToken: oauthAccessToken });
-    setUser(result.user);
-    setApiAccessToken(result.accessToken);
+    const data = await authService.login({ accessToken: oauthAccessToken });
+    setUser(data.user);
+    setApiAccessToken(data.accessToken);
+  };
+
+  const renewToken = async () => {
+    const data = await authService.renewToken();
+    setUser(data.user);
+    setApiAccessToken(data.accessToken);
   };
 
   useEffect(() => {
-    if (apiAccessToken) {
-      ApiConfig.setAuthHeader(apiAccessToken);
-    }
+    if (!apiAccessToken) return;
+    ApiConfig.setAuthHeader(apiAccessToken);
   }, [apiAccessToken]);
 
-  return <AuthContext.Provider value={{ apiAccessToken, user, login }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ apiAccessToken, user, login, renewToken }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

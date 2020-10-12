@@ -1,14 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Route, Switch, useHistory } from 'react-router-dom';
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { JobApplicationManagement } from './pages/job-applications-management/JobApplicationManagement';
 import { Login } from './pages/login/Login';
-import { connect } from 'socket.io-client';
-import { AuthenticationService } from 'api-lib/dist/services/authentication.service';
 import { ApiConfig, OperationMode } from 'api-lib/dist/config';
-import { AuthContext } from './shared/context/auth.context';
+import { ProtectedRoute } from './shared/components/ProtectedRoute';
 
 const mode = process.env.NODE_ENV === 'development' ? OperationMode.DEV : OperationMode.PROD;
-ApiConfig.setOperationMode(mode);
+ApiConfig.setOperationMode(mode); // setting base url for other services before use
+
 // const socket = connect('wss://api.jobs-tracker.localhost');
 
 // socket.on('connection', (data: any) => console.log('connected', data));
@@ -18,27 +17,13 @@ ApiConfig.setOperationMode(mode);
 // socket.emit('msgToServer');
 
 // const authService = new AuthenticationService();
-
 function App() {
-  const history = useHistory();
-  const { apiAccessToken } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (apiAccessToken) {
-      history.push('/applications');
-    } else {
-      history.push('/login');
-    }
-  }, [apiAccessToken]);
-
   return (
     <React.Fragment>
       <Switch>
-        <Route path='/login' render={(props) => <Login {...props} />} />
-        <Route
-          path='/applications'
-          render={(props) => <JobApplicationManagement {...props} apiAccessToken={apiAccessToken} />}
-        />
+        <ProtectedRoute exact path='/applications' component={JobApplicationManagement} />
+        <Route exact path='/login' component={Login} />
+        <Redirect from='/' exact to='/applications' />
       </Switch>
     </React.Fragment>
   );
