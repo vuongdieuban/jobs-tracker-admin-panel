@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import { JobApplicationManagement } from './pages/job-applications-management/JobApplicationManagement';
 import { Login } from './pages/login/Login';
 import { ApiConfig, OperationMode } from 'api-lib/dist/config';
