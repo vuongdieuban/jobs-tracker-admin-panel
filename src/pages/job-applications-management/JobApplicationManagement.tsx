@@ -1,9 +1,11 @@
 import { ApiConfig, OperationMode } from 'api-lib/dist/config';
 import { JobApplicationReorderRequest } from 'api-lib/dist/dto/job-application.dto';
 import { JobApplicationService } from 'api-lib/dist/services/job-application.service';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+import { connect } from 'socket.io-client';
 import { StatusName } from '../../constants/status-name.enum';
+import { AuthContext } from '../../shared/context/auth.context';
 import { ApplicationStatusColumn } from './components/ApplicationStatusColumn';
 import { StatusColumns } from './models/application-status-columns.mode';
 import { ApplicationStatus } from './models/application-status.model';
@@ -11,7 +13,7 @@ import { Application } from './models/application.model';
 import { JobApplicationHelper, reorderCards, reorderColumns } from './utils';
 
 const env = process.env.NODE_ENV;
-console.log("ENV", env)
+console.log('ENV', env);
 ApiConfig.setOperationMode(env === 'development' ? OperationMode.DEV : OperationMode.PROD);
 
 const applicationHelper = new JobApplicationHelper();
@@ -21,6 +23,22 @@ function JobApplicationManagement(props: any) {
   const [statusColumns, setStatusColumns] = useState<StatusColumns>();
   const [updatedStatus, setUpdatedStatus] = useState<ApplicationStatus>();
   const [updatedApplication, setUpdatedApplication] = useState<Application>();
+  const { apiAccessToken } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (!apiAccessToken) {
+      return;
+    }
+    const socket = connect('wss://api.jobs-tracker.localhost', {
+      query: {
+        authorization: apiAccessToken,
+      },
+    });
+
+    socket.on('connection', (data: any) => console.log('connected', data));
+    socket.on('msgToClient', (data: any) => console.log('rcv from Server:', data));
+    socket.emit('msgToServer');
+  }, [apiAccessToken]);
 
   useEffect(() => {
     const fetchApplications = async () => {
