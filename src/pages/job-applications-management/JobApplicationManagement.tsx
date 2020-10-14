@@ -37,7 +37,8 @@ function JobApplicationManagement(props: any) {
 
     socket.on('connection', (data: any) => console.log('connected', data));
     socket.on('msgToClient', (data: any) => console.log('rcv from Server:', data));
-    socket.emit('msgToServer');
+    socket.on('exception', (data: any) => console.log('Exception in Socket', data));
+    socket.emit('msgToServer', { payload: 'Something here' });
   }, [apiAccessToken]);
 
   useEffect(() => {
