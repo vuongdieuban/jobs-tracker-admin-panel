@@ -10,6 +10,7 @@ import { ApplicationStatusColumn } from './components/ApplicationStatusColumn';
 import { StatusColumns } from './models/application-status-columns.mode';
 import { ApplicationStatus } from './models/application-status.model';
 import { Application } from './models/application.model';
+import { ApplicationCreatedEvent } from './models/websocket/created-event.model';
 import { JobApplicationHelper, reorderCards, reorderColumns } from './utils';
 
 const env = process.env.NODE_ENV;
@@ -23,17 +24,14 @@ function JobApplicationManagement(props: any) {
   const [statusColumns, setStatusColumns] = useState<StatusColumns>();
   const [updatedStatus, setUpdatedStatus] = useState<ApplicationStatus>();
   const [updatedApplication, setUpdatedApplication] = useState<Application>();
+  const [createdEvent, setCreatedEvent] = useState<ApplicationCreatedEvent>();
   const { apiAccessToken } = useContext(AuthContext);
-
-  const handleCreatedEvent = (data: any) => {
-    console.log('data:', data);
-    const { statusId } = data.payload;
-  };
 
   useEffect(() => {
     if (!apiAccessToken) {
       return;
     }
+    // Cannot put socket here otherwise it will reconnect when statusColumn change
     const socket = connect('wss://api.jobs-tracker.localhost', {
       query: {
         authorization: apiAccessToken,
@@ -44,9 +42,25 @@ function JobApplicationManagement(props: any) {
     socket.on('exception', (data: any) => console.log('Exception in Socket', data));
     socket.on('StatusChanged', (data: any) => console.log('data', data));
     socket.on('Reordered', (data: any) => console.log('data', data));
-    socket.on('Created', (data: any) => handleCreatedEvent(data));
+    socket.on('Created', (data: ApplicationCreatedEvent) => setCreatedEvent(data));
     socket.on('Archived', (data: any) => console.log('data', data));
-  }, [apiAccessToken]);
+  }, [apiAccessToken, setCreatedEvent]);
+
+  useEffect(() => {
+    console.log('data:', createdEvent);
+    if (!createdEvent) return;
+    if (!statusColumns) return;
+
+    console.log('StatusCol', statusColumns);
+    const { statusId } = createdEvent.payload;
+
+    let updatedColumn = { ...statusColumns[statusId] };
+    const updatedApplications = [...updatedColumn.applications];
+    updatedApplications.push({ ...createdEvent.payload, id: createdEvent.payload.applicationId });
+    updatedColumn = { ...updatedColumn, applications: updatedApplications };
+    const updatedStatusColumns = { ...statusColumns, [statusId]: updatedColumn };
+    setStatusColumns(updatedStatusColumns);
+  }, [createdEvent]);
 
   useEffect(() => {
     const fetchApplications = async () => {
