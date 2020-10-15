@@ -25,6 +25,11 @@ function JobApplicationManagement(props: any) {
   const [updatedApplication, setUpdatedApplication] = useState<Application>();
   const { apiAccessToken } = useContext(AuthContext);
 
+  const handleCreatedEvent = (data: any) => {
+    console.log('data:', data);
+    const { statusId } = data.payload;
+  };
+
   useEffect(() => {
     if (!apiAccessToken) {
       return;
@@ -36,9 +41,11 @@ function JobApplicationManagement(props: any) {
     });
 
     socket.on('connection', (data: any) => console.log('connected', data));
-    socket.on('msgToClient', (data: any) => console.log('rcv from Server:', data));
     socket.on('exception', (data: any) => console.log('Exception in Socket', data));
-    socket.emit('msgToServer', { payload: 'Something here' });
+    socket.on('StatusChanged', (data: any) => console.log('data', data));
+    socket.on('Reordered', (data: any) => console.log('data', data));
+    socket.on('Created', (data: any) => handleCreatedEvent(data));
+    socket.on('Archived', (data: any) => console.log('data', data));
   }, [apiAccessToken]);
 
   useEffect(() => {
