@@ -63,21 +63,21 @@ export class JobApplicationHelper {
     // Applied applications should be all except status wish list and archived
     return this.applications
       .filter((item) => item.status.name !== StatusName.WISH_LIST && item.status.name !== StatusName.ARCHIVED)
-      .sort((a, b) => a.statusDisplayPosition - b.statusDisplayPosition)
+      .sort((a, b) => a.position - b.position)
       .map((application) => this.mapApplicationToViewModel(application));
   }
 
   private getWishListApplications(): Application[] {
     return this.applications
       .filter((item) => item.status.name === StatusName.WISH_LIST)
-      .sort((a, b) => a.statusDisplayPosition - b.statusDisplayPosition)
+      .sort((a, b) => a.position - b.position)
       .map((application) => this.mapApplicationToViewModel(application));
   }
 
   private mapApplicationToViewModel(application: ApplicationBackendModel): Application {
     return {
       id: application.id,
-      position: application.statusDisplayPosition,
+      position: application.position,
       statusId: application.status.id,
       userId: application.user.id,
       jobPost: application.jobPost,

@@ -51,7 +51,6 @@ function JobApplicationManagement(props: any) {
     if (!createdEvent) return;
     if (!statusColumns) return;
 
-    console.log('StatusCol', statusColumns);
     const { statusId } = createdEvent.payload;
 
     let updatedColumn = { ...statusColumns[statusId] };
@@ -140,6 +139,7 @@ function JobApplicationManagement(props: any) {
   const renderColumns = (columns: StatusColumns) => {
     // When column have their display position, sort them based on their position first before render
     const displayColumns = Object.values(columns).sort((a, b) => a.status.position - b.status.position);
+    console.log('DisplayCOl', displayColumns);
     return (
       <Droppable droppableId='column-drop' direction='horizontal' type='StatusColumn'>
         {(droppableProvided, droppableSnapshot) => (
