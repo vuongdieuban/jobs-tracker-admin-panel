@@ -123,9 +123,7 @@ function JobApplicationManagement(props: any) {
       return;
     }
     const update = async () => {
-      const { id, statusId } = updatedApplication;
-      const archivedStatus = applicationHelper.getStatusByName(StatusName.ARCHIVED);
-      const position = statusId === archivedStatus.id ? undefined : updatedApplication.position;
+      const { id, statusId, position } = updatedApplication;
 
       const payload: JobApplicationReorderRequest = {
         statusId,
@@ -150,7 +148,6 @@ function JobApplicationManagement(props: any) {
   const renderColumns = (columns: StatusColumns) => {
     // When column have their display position, sort them based on their position first before render
     const displayColumns = Object.values(columns).sort((a, b) => a.status.position - b.status.position);
-    console.log('DisplayCOl', displayColumns);
     return (
       <Droppable droppableId='column-drop' direction='horizontal' type='StatusColumn'>
         {(droppableProvided, droppableSnapshot) => (
