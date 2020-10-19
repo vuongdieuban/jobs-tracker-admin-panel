@@ -25,6 +25,7 @@ function JobApplicationManagement(props: any) {
   const [updatedStatus, setUpdatedStatus] = useState<ApplicationStatus>();
   const [updatedApplication, setUpdatedApplication] = useState<Application>();
   const [createdEvent, setCreatedEvent] = useState<ApplicationCreatedEvent>();
+  const [removedApplicationId, setRemovedApplicationId] = useState<string>();
   const { apiAccessToken } = useContext(AuthContext);
 
   useEffect(() => {
@@ -81,9 +82,8 @@ function JobApplicationManagement(props: any) {
       (application) => application.id !== removedApplication.id
     );
 
-    const archivedStatus = applicationHelper.getStatusByName(StatusName.ARCHIVED);
     setStatusColumns({ ...statusColumns, [statusId]: updatedStatusColumn });
-    setUpdatedApplication({ ...removedApplication, statusId: archivedStatus.id });
+    setRemovedApplicationId(removedApplication.id);
   };
 
   const handleDragEnd = (result: DropResult, columns: StatusColumns) => {
@@ -135,6 +135,17 @@ function JobApplicationManagement(props: any) {
     };
     update();
   }, [updatedApplication]);
+
+  useEffect(() => {
+    if (!removedApplicationId) {
+      return;
+    }
+
+    const archiveApplication = async () => {
+      const data = await applicationService.archive(removedApplicationId, true);
+    };
+    archiveApplication();
+  }, [removedApplicationId]);
 
   const renderColumns = (columns: StatusColumns) => {
     // When column have their display position, sort them based on their position first before render

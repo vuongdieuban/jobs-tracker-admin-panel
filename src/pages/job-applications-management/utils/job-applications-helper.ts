@@ -62,7 +62,8 @@ export class JobApplicationHelper {
   private getAppliedApplications(): Application[] {
     // Applied applications should be all except status wish list and archived
     return this.applications
-      .filter((item) => item.status.name !== StatusName.WISH_LIST && item.status.name !== StatusName.ARCHIVED)
+      .filter((item) => item.status.name !== StatusName.WISH_LIST)
+      .filter((item) => !item.archive)
       .sort((a, b) => a.position - b.position)
       .map((application) => this.mapApplicationToViewModel(application));
   }
@@ -70,6 +71,7 @@ export class JobApplicationHelper {
   private getWishListApplications(): Application[] {
     return this.applications
       .filter((item) => item.status.name === StatusName.WISH_LIST)
+      .filter((item) => !item.archive)
       .sort((a, b) => a.position - b.position)
       .map((application) => this.mapApplicationToViewModel(application));
   }
