@@ -1,6 +1,6 @@
-import { JobApplicationStatus as StatusBackendModel } from 'api-lib/dist/dto/job-application-status.dto';
+import { Status as StatusBackendModel } from 'api-lib/dist/dto/';
 import { JobApplication as ApplicationBackendModel } from 'api-lib/dist/dto/job-application.dto';
-import { JobApplicationStatusService } from 'api-lib/dist/services/job-application-status.service';
+import { StatusService } from 'api-lib/dist/services/';
 import { JobApplicationService } from 'api-lib/dist/services/job-application.service';
 import { StatusName } from '../../../constants/status-name.enum';
 import { StatusColumn, StatusColumns } from '../models/application-status-columns.mode';
@@ -9,13 +9,13 @@ import { Application } from '../models/application.model';
 
 export class JobApplicationHelper {
   private readonly applicationService: JobApplicationService;
-  private readonly statusService: JobApplicationStatusService;
+  private readonly statusService: StatusService;
   private applications: ApplicationBackendModel[] = [];
   private status: StatusBackendModel[] = [];
 
   constructor() {
     this.applicationService = new JobApplicationService();
-    this.statusService = new JobApplicationStatusService();
+    this.statusService = new StatusService();
   }
 
   public async generateDisplayStatusColumns(): Promise<StatusColumns> {
@@ -52,7 +52,7 @@ export class JobApplicationHelper {
   }
 
   public getStatusByName(name: StatusName): ApplicationStatus {
-    const data = this.status.map((s) => this.mapToViewModel(s)).find((s) => s.name === name);
+    const data = this.status.map(s => this.mapToViewModel(s)).find(s => s.name === name);
     if (!data) {
       throw new Error(`Cannot find status with name ${name}`);
     }
@@ -62,18 +62,18 @@ export class JobApplicationHelper {
   private getAppliedApplications(): Application[] {
     // Applied applications should be all except status wish list and archived
     return this.applications
-      .filter((item) => item.status.name !== StatusName.WISH_LIST)
-      .filter((item) => !item.archive)
+      .filter(item => item.status.name !== StatusName.WISH_LIST)
+      .filter(item => !item.archive)
       .sort((a, b) => a.position - b.position)
-      .map((application) => this.mapApplicationToViewModel(application));
+      .map(application => this.mapApplicationToViewModel(application));
   }
 
   private getWishListApplications(): Application[] {
     return this.applications
-      .filter((item) => item.status.name === StatusName.WISH_LIST)
-      .filter((item) => !item.archive)
+      .filter(item => item.status.name === StatusName.WISH_LIST)
+      .filter(item => !item.archive)
       .sort((a, b) => a.position - b.position)
-      .map((application) => this.mapApplicationToViewModel(application));
+      .map(application => this.mapApplicationToViewModel(application));
   }
 
   private mapApplicationToViewModel(application: ApplicationBackendModel): Application {

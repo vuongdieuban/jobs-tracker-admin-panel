@@ -33,7 +33,7 @@ function JobApplicationManagement(props: any) {
       return;
     }
     // Cannot put socket here otherwise it will reconnect when statusColumn change
-    const socket = connect('wss://api.jobs-tracker.localhost', {
+    const socket = connect('ws://localhost:5000', {
       query: {
         authorization: apiAccessToken,
       },
@@ -79,7 +79,7 @@ function JobApplicationManagement(props: any) {
     const statusColumn = statusColumns[statusId];
     const updatedStatusColumn = { ...statusColumn };
     updatedStatusColumn.applications = updatedStatusColumn.applications.filter(
-      (application) => application.id !== removedApplication.id
+      application => application.id !== removedApplication.id,
     );
 
     setStatusColumns({ ...statusColumns, [statusId]: updatedStatusColumn });
@@ -180,7 +180,7 @@ function JobApplicationManagement(props: any) {
   return (
     <React.Fragment>
       {statusColumns && (
-        <DragDropContext onDragEnd={(result) => handleDragEnd(result, statusColumns)}>
+        <DragDropContext onDragEnd={result => handleDragEnd(result, statusColumns)}>
           {renderColumns(statusColumns)}
         </DragDropContext>
       )}
